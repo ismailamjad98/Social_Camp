@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Sendmail;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -50,19 +51,24 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password)
         ]);
+       
+        //send Email by using php artisan make:mail
+        Mail::to($request->email)->send(new Sendmail());
 
-        // email data
-        $Email = array(
-            'name' => $request->name,
-            'email' => $request->email,
-        );
 
-        // send email with the template
-        Mail::send('welcome_email', $Email, function ($message) use ($Email) {
-            $message->to($Email['email'], $Email['name'])
-                ->subject('Welcome to SocialCamp')
-                ->from('Ismailamjad98@gmail.com', 'SocialCamp');
-        });
+                                 //send email by just using Send function
+        // // email data
+        // $Email = array(
+        //     'name' => $request->name,
+        //     'email' => $request->email,
+        // );
+
+        // // send email with the template
+        // Mail::send('welcome_email', $Email, function ($message) use ($Email) {
+        //     $message->to($Email['email'], $Email['name'])
+        //         ->subject('Welcome to SocialCamp')
+        //         ->from('Ismailamjad98@yahoo.com', 'SocialCamp');
+        // });
 
 
         //message on Register

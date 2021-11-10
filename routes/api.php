@@ -36,6 +36,7 @@ Route::middleware(['token'])->group(function () {
 //POST Routes
 Route::middleware(['token'])->group(function () {
     Route::post('/post', [PostController::class , 'index']);
+    Route::post('/delete', [PostController::class , 'destroy']);
     // Route::get('/profile', [UserController::class , 'profile']);
 });
 

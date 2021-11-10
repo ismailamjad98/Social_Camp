@@ -7,6 +7,7 @@ use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
@@ -21,7 +22,7 @@ class PostController extends Controller
         $request->validate(
             [
                 'title' => 'required',
-                'description' => 'required',
+                'body' => 'required',
             ]
         );
         //get token from header and check user id
@@ -31,7 +32,7 @@ class PostController extends Controller
         $userID = $decoded->id;
         $post = new Post;
         $post->title = $request->title;
-        $post->description = $request->description;
+        $post->body = $request->body;
         $post->user_id = $userID;
         $post->save();
         //message on Successfully
@@ -105,5 +106,6 @@ class PostController extends Controller
     public function destroy($id)
     {
         //
+        
     }
 }
