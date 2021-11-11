@@ -12,100 +12,113 @@ use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Request $request)
+
+    public function create(Request $request)
     {
         $request->validate(
             [
                 'title' => 'required',
                 'body' => 'required',
+                'image' => 'required',
+                'status' => 'required',
             ]
         );
         //get token from header and check user id
         $getToken = $request->bearerToken();
         $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
-
         $userID = $decoded->id;
+        //save a new post in db
         $post = new Post;
         $post->title = $request->title;
         $post->body = $request->body;
         $post->user_id = $userID;
+        $post->status = $request->status;
+        // Attachments_folder is created in Storage/app/ 
+        $post->image = $request->file('image')->store('Attachments_Folder');
         $post->save();
         //message on Successfully
         return response([
             'Status' => '200',
-            'message' => 'you have successfully Post',
+            'message' => 'successfully Posted',
+        ], 200);
+    }
+
+    public function myposts(Request $request)
+    {
+        //get token from header and check user id
+        $getToken = $request->bearerToken();
+        $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
+        $userID = $decoded->id;
+
+        $myposts = Post::all()->where('user_id' ,  $userID);
+        
+        if (is_null($myposts)) {
+            return response()->json('Data not found', 404); 
+        }
+        return $myposts;
+    }
+
+    public function allposts(Request $request)
+    {
+
+        $myposts = Post::all();
+        
+        if (is_null($myposts)) {
+            return response()->json('Data not found', 404); 
+        }
+        return $myposts;
+    }
+
+    public function update(Request $request, $id)
+    {
+        //get token from header and check user id
+        $getToken = $request->bearerToken();
+        $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
+        $userID = $decoded->id;
+
+        $request->validate(
+            [
+                'title' => 'required',
+                'body' => 'required',
+                'image' => 'required',
+                'status' => 'required'
+            ]
+        );
+        $post = Post::find($id);
+        $post->title = $request->title;
+        $post->body = $request->body;
+        // Attachments_folder is created in Storage/app/ 
+        $post->image = $request->file('image')->store('Attachments_Folder');
+        $post->user_id = $userID;
+        $post->status = $request->status;
+        $post->update();
+
+        //message on Successfully
+        return response([
+            'Status' => '200',
+            'message' => 'you have successfully Update Post',
         ], 200);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Remove the specified record from storage.
      *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //
-        
+
+        if (Post::where('id', '=', $id)->delete($id)) {
+            return response([
+                'Status' => '200',
+                'message' => 'you have successfully Deleted Entry',
+                'Deleted Post ID' => $id
+            ], 200);
+        } else {
+            // save token in db to user 
+            return response([
+                'Status' => '201',
+                'message' => 'This Post Does not Exits'
+            ], 200);
+        }
     }
 }

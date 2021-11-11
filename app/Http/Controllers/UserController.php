@@ -6,16 +6,18 @@ use App\Mail\Sendmail;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Support\Facades\Hash;
 use App\Models\Token;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\Console\Input\Input;
 
 class UserController extends Controller
 {
-    //
+    /**
+     * This Function is creating a Token for the authenticated user.
+     *
+     */
+
     function createToken($data)
     {
         $key = "SocialCamp";
@@ -34,6 +36,11 @@ class UserController extends Controller
         return $token;
     }
 
+
+    /**
+     * Registering a new user.
+     */
+
     public function register(Request $request)
     {
         // Validate the user inputs
@@ -45,31 +52,38 @@ class UserController extends Controller
             ]
         );
 
+        //create a link to varify email.
+        $gen_token = $this->createToken($request->email);
+        $url = "http://localhost:8000/api/emailVerify/" . $gen_token.'/'. $request->email;
+
         //create new User in DB
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
+            'url' => $url
         ]);
-       
+        
         //send Email by using php artisan make:mail
-        Mail::to($request->email)->send(new Sendmail());
+        Mail::to($request->email)->send(new Sendmail($user->url, $user->id));
 
 
-                                 //send email by just using Send function
-        // // email data
-        // $Email = array(
-        //     'name' => $request->name,
-        //     'email' => $request->email,
-        // );
-
-        // // send email with the template
-        // Mail::send('welcome_email', $Email, function ($message) use ($Email) {
-        //     $message->to($Email['email'], $Email['name'])
-        //         ->subject('Welcome to SocialCamp')
-        //         ->from('Ismailamjad98@yahoo.com', 'SocialCamp');
-        // });
-
+        /**
+         * send email by just using Send function.
+         * // email data
+         * $Email = array(
+         *  'name' => $request->name,
+         * 'email' => $request->email,
+         * );
+         * 
+         * send email with the template
+         * Mail::send('welcome_email', $Email, function ($message) use ($Email) {
+         * $message->to($Email['email'], $Email['name'])
+         *          ->subject('Welcome to SocialCamp')
+         *          ->from('Ismailamjad98@yahoo.com', 'SocialCamp');
+         * });
+         *
+         */
 
         //message on Register
         return response([
@@ -79,6 +93,34 @@ class UserController extends Controller
             'user' => $user
         ], 200);
     }
+
+    //create function to verify the email
+    function EmailVerify($token , $email){
+
+        $emailVerify = User::where('email',$email)->first();
+
+        if($emailVerify->email_verified_at != null){
+
+            return response([
+                'message'=> 'Already Varified'
+            ]);
+
+        }elseif ($emailVerify) {
+
+            $emailVerify->email_verified_at = date('Y-m-d h:i:s');
+            $emailVerify->save();
+
+            return response([
+                'message' => 'Thankyou Your Eamil Verified NOW !!!'
+            ]);
+        }else{
+
+            return response([
+                'message'=>'Something Went Wrong'
+            ]);
+        }
+    }
+
 
     // Login Method
     public function login(Request $request)
@@ -167,7 +209,6 @@ class UserController extends Controller
         }
 
         $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
-
         $userID = $decoded->id;
 
         if($userID) {
@@ -177,5 +218,35 @@ class UserController extends Controller
                 "Details" => $profile
             ], 200);
         }
+    }
+
+    // Update user profile
+    public function update(Request $request, $id)
+    {
+        //get token from header and check user id
+        $getToken = $request->bearerToken();
+        $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
+        $userID = $decoded->id;
+
+        $request->validate(
+            [
+                'name' => 'required|string|min:3',
+                'email' => 'required|string',
+                'password' => 'required|string|min:5'
+            ]
+        );
+
+        $userupdate = User::find($id);
+        $userupdate->name = $request->name;
+        $userupdate->email = $request->email;
+        $userupdate->password = bcrypt($request->password);
+        $userupdate->save();
+        
+        //message on Successfully
+        return response([
+            'Status' => '200',
+            'message' => 'you have successfully Update User Profile',
+        ], 200);
+
     }
 }

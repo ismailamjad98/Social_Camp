@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VerifyEmailController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -24,20 +26,20 @@ use Illuminate\Support\Facades\Route;
 //User Routes
 Route::post('/register', [UserController::class , 'register']);
 Route::post('/login', [UserController::class , 'login']);
-// Route::get('/profile', [UserController::class , 'profile']);
-// Route::post('/logout', [UserController::class , 'Logout']);
+Route::get('emailVerify/{token}/{email}', [UserController::class , 'EmailVerify']);
 
-//Routes with middleware
+//User Routes with middleware
 Route::middleware(['token'])->group(function () {
     Route::post('/logout', [UserController::class , 'Logout']);
     Route::get('/profile', [UserController::class , 'profile']);
+    Route::post('/profile/update/{id}', [UserController::class , 'update']);
 });
 
 //POST Routes
 Route::middleware(['token'])->group(function () {
-    Route::post('/post', [PostController::class , 'index']);
-    Route::post('/delete', [PostController::class , 'destroy']);
-    // Route::get('/profile', [UserController::class , 'profile']);
+    Route::post('/post', [PostController::class , 'create']);
+    Route::post('post/update/{id}', [PostController::class , 'update']);
+    Route::post('post/myposts', [PostController::class , 'myposts']);
+    Route::post('post/allposts', [PostController::class , 'allposts']);
+    Route::post('post/delete/{id}', [PostController::class , 'destroy']);
 });
-
-

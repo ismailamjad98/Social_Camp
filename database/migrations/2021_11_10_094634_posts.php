@@ -19,6 +19,7 @@ class Posts extends Migration
             $table->text('title');
             $table->longText('body');
             $table->text('image')->nullable();
+            $table->string('status');
             $table->timestamps();
         });
     }

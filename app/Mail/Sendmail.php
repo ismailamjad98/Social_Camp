@@ -19,10 +19,13 @@ class Sendmail extends Mailable
      *
      * @return void
      */
+    public $url;
+    public $email;
 
-    public function __construct()
+    public function __construct($url, $email)
     {
-        
+       $this->url = $url;    
+       $this->email = $email;    
     }
 
     /**
@@ -34,6 +37,6 @@ class Sendmail extends Mailable
     {
         return $this->from('ismail@gmail.com', 'Social Camp')
             ->subject('New User Register')
-            ->markdown('welcome_email');
+            ->view('welcome_email');
     }
 }
