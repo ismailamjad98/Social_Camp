@@ -136,22 +136,30 @@ class UserController extends Controller
             'password' => $request->password,
         ];
 
+         //give token after login and assign user id to token
+         $token = $this->createToken($user->id);
 
         //check the user in DB and varify if it is authenticated or not
         if (Auth::attempt($data)) {
-            //give token after login and assign user id to token
-            $token = $this->createToken($user->id);
-
+            
             // check if user is already loggedin and assigned token 
-            if (Token::where('userID', '=', $user->id)->first()) {
+            if (Token::where('user_id', '=', $user->id)->first()) {
+                $token = Token::where('user_id', '=', $user->id)->first()->delete();
+                $new_token = $this->createToken($user->id);
+                // save token in db to user 
+                $token_save = Token::create([
+                    'user_id' => $user->id,
+                    'token' => $new_token
+                ]);
+
                 return response([
                     'Message' => "Already Login!",
-                    "Token" => $token
+                    "Token" => $new_token
                 ]);
             } else {
                 // save token in db to user 
                 $token_save = Token::create([
-                    'userID' => $user->id,
+                    'user_id' => $user->id,
                     'token' => $token
                 ]);
             }
@@ -180,7 +188,7 @@ class UserController extends Controller
 
         $userID = $decoded->id;
 
-        $userExist = Token::where("userID", $userID)->first();
+        $userExist = Token::where("user_id", $userID)->first();
 
         if ($userExist) {
             $userExist->delete();
@@ -223,30 +231,38 @@ class UserController extends Controller
     // Update user profile
     public function update(Request $request, $id)
     {
-        //get token from header and check user id
-        $getToken = $request->bearerToken();
-        $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
-        $userID = $decoded->id;
-
-        $request->validate(
-            [
-                'name' => 'required|string|min:3',
-                'email' => 'required|string',
-                'password' => 'required|string|min:5'
-            ]
-        );
-
-        $userupdate = User::find($id);
-        $userupdate->name = $request->name;
-        $userupdate->email = $request->email;
-        $userupdate->password = bcrypt($request->password);
-        $userupdate->save();
-        
+        $userupdate = User::find($id)->first()->update($request->all());
         //message on Successfully
-        return response([
-            'Status' => '200',
-            'message' => 'you have successfully Update User Profile',
-        ], 200);
-
+        if(isset($userupdate)){
+            return response([
+                'Status' => '200',
+                'message' => 'you have successfully Update User Profile',
+            ], 200);
+    
+        }
+        if(!isset($userupdate)){
+            return response([
+                'Status' => '200',
+                'message' => 'User not found',
+            ], 200);
+        }
     }
+
+    // //delete User
+    // public function destroy_User($id)
+    // {
+
+    //     if (User::where('id', '=', $id)->delete($id)) {
+    //         return response([
+    //             'Status' => '200',
+    //             'message' => 'you have successfully Deleted Entry',
+    //             'Deleted User ID' => $id
+    //         ], 200);
+    //     } else {
+    //         return response([
+    //             'Status' => '201',
+    //             'message' => 'This User Does not Exits'
+    //         ], 200);
+    //     }
+    // }
 }

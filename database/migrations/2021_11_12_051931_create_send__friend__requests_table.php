@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class TokenTable extends Migration
+class CreateSendFriendRequestsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class TokenTable extends Migration
      */
     public function up()
     {
-        //
-        Schema::create('tokens', function(Blueprint $table){
+        Schema::create('send__friend__requests', function (Blueprint $table) {
             $table->id();
-            $table->string("user_id");
-            $table->text("token");
-            $table->timestamps();
+            $table->integer('sender_id');
+            $table->integer('reciver_id');
+            $table->string('status')->default(false);
         });
     }
 
@@ -29,7 +28,6 @@ class TokenTable extends Migration
      */
     public function down()
     {
-        //
-        Schema::dropIfExists('tokens');
+        Schema::dropIfExists('send__friend__requests');
     }
 }

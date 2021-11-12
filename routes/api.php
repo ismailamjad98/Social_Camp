@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\Send_Friend_Request;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyEmailController;
 use App\Models\User;
@@ -30,16 +31,21 @@ Route::get('emailVerify/{token}/{email}', [UserController::class , 'EmailVerify'
 
 //User Routes with middleware
 Route::middleware(['token'])->group(function () {
+    //User Routes
     Route::post('/logout', [UserController::class , 'Logout']);
     Route::get('/profile', [UserController::class , 'profile']);
     Route::post('/profile/update/{id}', [UserController::class , 'update']);
-});
+    // Route::post('/profile/delete/{id}', [UserController::class , 'destroy_User']);
+    
 
-//POST Routes
-Route::middleware(['token'])->group(function () {
+    //POST Routes
     Route::post('/post', [PostController::class , 'create']);
     Route::post('post/update/{id}', [PostController::class , 'update']);
-    Route::post('post/myposts', [PostController::class , 'myposts']);
-    Route::post('post/allposts', [PostController::class , 'allposts']);
+    Route::get('post/myposts', [PostController::class , 'myposts']);
+    Route::get('post/allposts', [PostController::class , 'allposts']);
     Route::post('post/delete/{id}', [PostController::class , 'destroy']);
+
+    //Send Friend Request Routes
+    Route::post('/send_Request', [Send_Friend_Request::class, 'Send_Friend_Request']);
 });
+

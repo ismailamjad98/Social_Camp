@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Token extends Model
+class Send_Friend_Request extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        "user_id",
-        "token"
+        'reciver_id',
     ];
+
+    public $timestamps = false;
 }
