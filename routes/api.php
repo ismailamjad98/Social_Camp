@@ -41,11 +41,14 @@ Route::middleware(['token'])->group(function () {
     //POST Routes
     Route::post('/post', [PostController::class , 'create']);
     Route::post('post/update/{id}', [PostController::class , 'update']);
-    Route::get('post/myposts', [PostController::class , 'myposts']);
+    Route::get('post/myposts', [PostController::class , 'myposts']); //myemptyposts
     Route::get('post/allposts', [PostController::class , 'allposts']);
     Route::post('post/delete/{id}', [PostController::class , 'destroy']);
 
     //Send Friend Request Routes
     Route::post('/send_Request', [Send_Friend_Request::class, 'Send_Friend_Request']);
+    Route::post('/my_requests', [Send_Friend_Request::class, 'My_Requests']);//myemptyrequests
+    Route::post('/receive_request', [Send_Friend_Request::class, 'Receive_Request']);
+
 });
 

@@ -51,11 +51,12 @@ class PostController extends Controller
         $userID = $decoded->id;
 
         $myposts = Post::all()->where('user_id' ,  $userID);
-        
-        if (is_null($myposts)) {
-            return response()->json('Data not found', 404); 
-        }
         return $myposts;
+        
+        if (empty($myposts)) {
+            return response()->json('You Dont have any Post', 404); 
+        }
+        
     }
 
     public function allposts(Request $request)

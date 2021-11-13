@@ -11,6 +11,8 @@ class Send_Friend_Request extends Model
 
     protected $fillable = [
         'reciver_id',
+        'sender_id',
+        'status',
     ];
 
     public $timestamps = false;
