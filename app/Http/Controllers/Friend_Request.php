@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Send_Friend_Request as ModelsSend_Friend_Request;
+use App\Models\Friend_Request as ModelsFriend_Request;
+use Illuminate\Http\Request;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use GuzzleHttp\Psr7\Message;
-use Illuminate\Http\Request;
 
-class Send_Friend_Request extends Controller
+class Friend_Request extends Controller
 {
     //
     public function Send_Friend_Request(Request $request){
@@ -32,10 +31,10 @@ class Send_Friend_Request extends Controller
         }
          //check if recever_user is exists in Users_table DB
          $users_table = User::where('id','=', $request->reciver_id)->first();
-         $data = new ModelsSend_Friend_Request();
+         $data = new ModelsFriend_Request();
 
         //chcek if user is already sended request or not
-        $check_alreadySent = ModelsSend_Friend_Request::where('sender_id',$userID)->where('reciver_id' , $request->reciver_id)->first();
+        $check_alreadySent = ModelsFriend_Request::where('sender_id',$userID)->where('reciver_id' , $request->reciver_id)->first();
 
         if (isset($check_alreadySent)) {
             return response([
@@ -64,15 +63,19 @@ class Send_Friend_Request extends Controller
         $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
         $userID = $decoded->id;
         
-        $myposts = ModelsSend_Friend_Request::all()->where('reciver_id' ,  $userID)->where('status', '0');
-        
-        if (!empty($myposts)) {
-            
-            return $myposts;
+        $req = ModelsFriend_Request::all()->where('reciver_id' ,  $userID)->where('status', '0');
 
-        }else{
-            return response()->json('You Dont have any Post', 404); 
+        // if(!isset($req)){
+
+        //     return response()->json('You Dont have any Friend Request', 404); 
+        // }
+
+        if (isset($req)) {
+            
+            return $req;
+
         }
+        
     }
 
     public function Receive_Request(Request $request){
@@ -95,45 +98,25 @@ class Send_Friend_Request extends Controller
         }
 
         //check if recever_user is exists in Request Table DB
-         $recive_req = ModelsSend_Friend_Request::where('sender_id',$request->sender_id)->where('reciver_id' , $userID)->first();
+        $recive_req = ModelsFriend_Request::where('sender_id',$request->sender_id )->where('reciver_id' , $userID)->first();
 
-        if ($recive_req->status == '1') {
-            return response([
-                "Message" => "You are already Friend of this User"
-            ]);
-        }
 
         if(isset($recive_req)) {
-            
             $recive_req->status = '1';
             $recive_req->save();
             return response([
                 "Message" => "Congratulations! You are Friends Now"
             ]);   
-        }else {
+        }else{
             return response([
                 "Message" => "This User Doesnot Sent you Friend Request"
             ]);
         }
-
-
-
-
-
-
-        // //get token from header and check user id
-        // $getToken = $request->bearerToken();
-        // $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
-        // $userID = $decoded->id;
-        
-        // $receive = ModelsSend_Friend_Request::where('reciver_id',$userID)->where('sender_id' , $request->sender_id)->first();
-
-        // // dd(ModelsSend_Friend_Request::where('reciver_id',$userID)->first());
-        // if(isset($receive)){
-           
-        //     $receive->status = '1';
-        // }else{
-
+        // if ($recive_req->status == '1') {
+        //     return response([
+        //         "Message" => "You are already Friend of this User"
+        //     ]);
         // }
+       
     }
 }

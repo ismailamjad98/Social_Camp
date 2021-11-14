@@ -1,12 +1,10 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\Send_Friend_Request;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\VerifyEmailController;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Friend_Request;
 
 
 /*
@@ -33,7 +31,7 @@ Route::get('emailVerify/{token}/{email}', [UserController::class , 'EmailVerify'
 Route::middleware(['token'])->group(function () {
     //User Routes
     Route::post('/logout', [UserController::class , 'Logout']);
-    Route::get('/profile', [UserController::class , 'profile']);
+    Route::get('/profile', [UserController::class , 'profile']); 
     Route::post('/profile/update/{id}', [UserController::class , 'update']);
     // Route::post('/profile/delete/{id}', [UserController::class , 'destroy_User']);
     
@@ -46,9 +44,14 @@ Route::middleware(['token'])->group(function () {
     Route::post('post/delete/{id}', [PostController::class , 'destroy']);
 
     //Send Friend Request Routes
-    Route::post('/send_Request', [Send_Friend_Request::class, 'Send_Friend_Request']);
-    Route::post('/my_requests', [Send_Friend_Request::class, 'My_Requests']);//myemptyrequests
-    Route::post('/receive_request', [Send_Friend_Request::class, 'Receive_Request']);
+    Route::post('/send_Request', [Friend_Request::class, 'Send_Friend_Request']);
+    Route::post('/my_requests', [Friend_Request::class, 'My_Requests']);//myemptyrequests
+    Route::post('/receive_request', [Friend_Request::class, 'Receive_Request']);
+
+    //Comments Routes
+    Route::post('/comment/{id}' , [CommentController::class, 'create']);
+    Route::post('/comment/delete/{id}' , [CommentController::class, 'delete']);
+    Route::post('/friend_post/{id}' , [CommentController::class, 'friend_posts']);
 
 });
 

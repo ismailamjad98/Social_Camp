@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Send_Friend_Request extends Model
+class Comment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'reciver_id',
-        'sender_id',
-        'status',
+        'post_id',
+        'user_id',
+        // 'post_of_user_id',
+        'comment',
+        'attachment',
     ];
 
-    public $timestamps = false;
+    public $timestamps =  false;
+
 }

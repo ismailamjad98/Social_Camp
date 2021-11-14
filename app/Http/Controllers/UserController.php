@@ -231,7 +231,9 @@ class UserController extends Controller
     // Update user profile
     public function update(Request $request, $id)
     {
-        $userupdate = User::find($id)->first()->update($request->all());
+        // $userupdate = User::find($id)->first()->update($request->all());
+        $userupdate = User::where('id', $id)->first();
+        // dd($userupdate);
         //message on Successfully
         if(isset($userupdate)){
             return response([
@@ -240,11 +242,11 @@ class UserController extends Controller
             ], 200);
     
         }
-        if(!isset($userupdate)){
+        if($userupdate == null){
             return response([
                 'Status' => '200',
                 'message' => 'User not found',
-            ], 200);
+            ], 404);
         }
     }
 
