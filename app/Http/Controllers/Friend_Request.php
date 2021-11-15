@@ -119,6 +119,29 @@ class Friend_Request extends Controller
                 "Message" => "Congratulations! You are Friends Now"
             ]);   
         }
-       
+    }
+
+    public function Delete_Request(Request $request, $id)
+    {
+        //get token from header and check user id
+        $getToken = $request->bearerToken();
+        $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
+        $userID = $decoded->id;
+
+        $delete_request = ModelsFriend_Request::all()->where('reciver_id',$userID)->where('sender_id' , $id)->first();
+
+        if (isset($delete_request)) {
+            $delete_request->delete($id);
+            return response([
+                'Status' => '200',
+                'message' => 'you have successfully Delete Friend Request',
+                'Deleted Post ID' => $id
+            ], 200);
+        }else {
+            return response([
+                'Status' => '201',
+                'message' => 'This User Not send Request'
+            ], 200);
+        }
     }
 }

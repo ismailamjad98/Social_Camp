@@ -43,6 +43,7 @@ Route::middleware(['token'])->group(function () {
     Route::post('/send_Request', [Friend_Request::class, 'Send_Friend_Request']);
     Route::post('/my_requests', [Friend_Request::class, 'My_Requests']);
     Route::post('/receive_request', [Friend_Request::class, 'Receive_Request']);
+    Route::post('delete_request/{id}', [Friend_Request::class, 'Delete_Request']);
 
     //Comments Routes
     Route::post('/comment/{id}' , [CommentController::class, 'create']);

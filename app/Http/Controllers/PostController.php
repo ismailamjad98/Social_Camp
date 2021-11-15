@@ -119,7 +119,7 @@ class PostController extends Controller
         $getToken = $request->bearerToken();
         $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
         $userID = $decoded->id;
-        $update_post = Post::all()->where('user_id',$userID)->where('id' , $id)->first();
+        $delete_post = Post::all()->where('user_id',$userID)->where('id' , $id)->first();
 
         if(Post::where('id', '!=', $id)){
             return response([
@@ -127,8 +127,8 @@ class PostController extends Controller
             ]);
         }
 
-        if (isset($update_post)) {
-            $update_post->delete($id);
+        if (isset($delete_post)) {
+            $delete_post->delete($id);
             return response([
                 'Status' => '200',
                 'message' => 'you have successfully Deleted Entry',
