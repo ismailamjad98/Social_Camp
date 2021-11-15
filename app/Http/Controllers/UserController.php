@@ -231,9 +231,7 @@ class UserController extends Controller
     // Update user profile
     public function update(Request $request, $id)
     {
-        // $userupdate = User::find($id)->first()->update($request->all());
         $userupdate = User::where('id', $id)->first();
-        // dd($userupdate);
         //message on Successfully
         if(isset($userupdate)){
             return response([
@@ -250,21 +248,23 @@ class UserController extends Controller
         }
     }
 
-    // //delete User
-    // public function destroy_User($id)
-    // {
-
-    //     if (User::where('id', '=', $id)->delete($id)) {
-    //         return response([
-    //             'Status' => '200',
-    //             'message' => 'you have successfully Deleted Entry',
-    //             'Deleted User ID' => $id
-    //         ], 200);
-    //     } else {
-    //         return response([
-    //             'Status' => '201',
-    //             'message' => 'This User Does not Exits'
-    //         ], 200);
-    //     }
-    // }
+    // //delete User Function if You want to delete the Registered User
+     /**
+         * public function destroy_User($id)
+         * {
+            * if (User::where('id', '=', $id)->delete($id)) {
+                * return response([
+                * 'Status' => '200',
+                * 'message' => 'you have successfully Deleted Entry',
+                *  'Deleted User ID' => $id
+                * ], 200);
+            * } else {
+                * return response([
+                *  'Status' => '201',
+                * 'message' => 'This User Does not Exits'
+                * ], 200);
+            * }
+         * }
+         *
+         */
 }

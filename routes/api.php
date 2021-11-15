@@ -18,10 +18,6 @@ use App\Http\Controllers\Friend_Request;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 //User Routes
 Route::post('/register', [UserController::class , 'register']);
 Route::post('/login', [UserController::class , 'login']);
@@ -39,18 +35,20 @@ Route::middleware(['token'])->group(function () {
     //POST Routes
     Route::post('/post', [PostController::class , 'create']);
     Route::post('post/update/{id}', [PostController::class , 'update']);
-    Route::get('post/myposts', [PostController::class , 'myposts']); //myemptyposts
+    Route::get('post/myposts', [PostController::class , 'myposts']); 
     Route::get('post/allposts', [PostController::class , 'allposts']);
     Route::post('post/delete/{id}', [PostController::class , 'destroy']);
 
     //Send Friend Request Routes
     Route::post('/send_Request', [Friend_Request::class, 'Send_Friend_Request']);
-    Route::post('/my_requests', [Friend_Request::class, 'My_Requests']);//myemptyrequests
+    Route::post('/my_requests', [Friend_Request::class, 'My_Requests']);
     Route::post('/receive_request', [Friend_Request::class, 'Receive_Request']);
 
     //Comments Routes
     Route::post('/comment/{id}' , [CommentController::class, 'create']);
+    Route::post('/comment/update/{id}' , [CommentController::class, 'update']);
     Route::post('/comment/delete/{id}' , [CommentController::class, 'delete']);
+    //comments on friends Post
     Route::post('/friend_post/{id}' , [CommentController::class, 'friend_posts']);
 
 });

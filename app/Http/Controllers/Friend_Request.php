@@ -65,15 +65,14 @@ class Friend_Request extends Controller
         
         $req = ModelsFriend_Request::all()->where('reciver_id' ,  $userID)->where('status', '0');
 
-        // if(!isset($req)){
-
-        //     return response()->json('You Dont have any Friend Request', 404); 
-        // }
-
-        if (isset($req)) {
+        if (json_decode($req) != null) {
             
             return $req;
 
+        }else{
+            return response([
+              'message' => 'You Dont have any Friend Request'
+            ], 404);
         }
         
     }
@@ -99,7 +98,19 @@ class Friend_Request extends Controller
 
         //check if recever_user is exists in Request Table DB
         $recive_req = ModelsFriend_Request::where('sender_id',$request->sender_id )->where('reciver_id' , $userID)->first();
+        
+        
+        if (!$recive_req) {
+            return response([
+                "Message" => "You do not have any friend request from this user"
+            ]);
+        }
 
+        if ($recive_req->status == '1') {
+            return response([
+                "Message" => "You are already Friend of this User"
+            ]);
+        }
 
         if(isset($recive_req)) {
             $recive_req->status = '1';
@@ -107,16 +118,7 @@ class Friend_Request extends Controller
             return response([
                 "Message" => "Congratulations! You are Friends Now"
             ]);   
-        }else{
-            return response([
-                "Message" => "This User Doesnot Sent you Friend Request"
-            ]);
         }
-        // if ($recive_req->status == '1') {
-        //     return response([
-        //         "Message" => "You are already Friend of this User"
-        //     ]);
-        // }
        
     }
 }

@@ -41,7 +41,7 @@ class CommentController extends Controller
 
         $comment = Post::where('id', '=', $id)->where('status', 'public')->first();
 
-        $pri = Post::where('id', '=', $id)->where('status', 'private')->first();
+        $private = Post::where('id', '=', $id)->where('status', 'private')->first();
 
         if (isset($comment)) {
 
@@ -62,7 +62,7 @@ class CommentController extends Controller
                     'message' => 'Something Went Wrong While added Comment',
                 ]);
             }
-        } elseif(isset($pri)) {
+        } elseif(isset($private)) {
             return response([
                 'message' => 'This Post is Private',
             ]);
@@ -76,7 +76,33 @@ class CommentController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        //get token from header and check user id
+        $getToken = $request->bearerToken();
+        $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
+        $userID = $decoded->id;
+
+        $update_comment = Comment::all()->where('user_id',$userID)->where('id' , $id)->first();
+       
+        if(Comment::where('id', '!=', $id)){
+            return response([
+                'message' => 'Comment Not Exits',
+            ]);
+        }
+        
+        if(isset($update_comment)){
+            $update_comment->update($request->all());
+            //message on Successfully
+            return response([
+                'Status' => '200',
+                'message' => 'you have successfully Update Comment',
+            ], 200);
+        }else{
+            //message on Unauthorize
+            return response([
+                'Status' => '200',
+                'message' => 'you are not Authorize to Update this Comment',
+            ], 200);
+        }
     }
 
     public function delete(Request $request, $id)
@@ -88,6 +114,12 @@ class CommentController extends Controller
         $userID = $decoded->id;
 
         $comment = Comment::where('id', $id)->where('user_id',$userID)->first();
+        
+        if(Comment::where('id', '!=', $id)){
+            return response([
+                'message' => 'Comment Not Exits',
+            ]);
+        }
         
         if (isset($comment)) {
             $comment->delete();

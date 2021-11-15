@@ -9,6 +9,7 @@ use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class PostController extends Controller
 {
@@ -51,10 +52,15 @@ class PostController extends Controller
         $userID = $decoded->id;
 
         $myposts = Post::all()->where('user_id' ,  $userID);
-        return $myposts;
         
-        if (empty($myposts)) {
-            return response()->json('You Dont have any Post', 404); 
+        if (json_decode($myposts) == null) {
+
+            return response([
+                'Status' => '200',
+                'message' => 'You dont have any Post',
+            ], 200);
+        }else{
+            return $myposts;
         }
         
     }
@@ -78,6 +84,13 @@ class PostController extends Controller
         $userID = $decoded->id;
 
         $post = Post::all()->where('user_id',$userID)->where('id' , $id)->first();
+
+        if(Post::where('id', '!=', $id)){
+            return response([
+                'message' => 'Post Not Exits',
+            ]);
+        }
+
         if(isset($post)){
             // Attachments_folder is created in Storage/app/ 
             $post->image = $request->file('image')->store('Attachments_Folder');
@@ -108,6 +121,12 @@ class PostController extends Controller
         $userID = $decoded->id;
         $update_post = Post::all()->where('user_id',$userID)->where('id' , $id)->first();
 
+        if(Post::where('id', '!=', $id)){
+            return response([
+                'message' => 'Post Not Exits',
+            ]);
+        }
+
         if (isset($update_post)) {
             $update_post->delete($id);
             return response([
@@ -118,7 +137,7 @@ class PostController extends Controller
         }else {
             return response([
                 'Status' => '201',
-                'message' => 'you are Authorize to delete other User Posts'
+                'message' => 'you are not Authorize to delete other User Posts'
             ], 200);
         }
     }
