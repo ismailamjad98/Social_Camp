@@ -15,9 +15,4 @@ class Post extends Model
         'image',
         'status',
     ];
-    
-    public function user()
-    {
-      return $this->belongsTo('App\Models\User');
-    }
 }

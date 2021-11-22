@@ -53,8 +53,8 @@ class UserController extends Controller
         );
 
         //create a link to varify email.
-        $gen_token = $this->createToken($request->email);
-        $url = "http://localhost:8000/api/emailVerify/" . $gen_token.'/'. $request->email;
+        $verification_token = $this->createToken($request->email);
+        $url = "http://localhost:8000/api/emailVerify/" . $verification_token.'/'. $request->email;
 
         //create new User in DB
         $user = User::create([
