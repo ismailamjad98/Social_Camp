@@ -7,6 +7,8 @@ use Closure;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
+use MongoDB\Client as MongoDB;
+
 
 class Check_Token_Middleware
 {
@@ -28,11 +30,21 @@ class Check_Token_Middleware
         }
         $decoded = JWT::decode($getToken, new Key("SocialCamp", "HS256"));
 
-        // $userID = $decoded->id;
-
+        $userID = $decoded->id;
+        
         // if token is invalid
-        $check = Token::where('token' , $getToken)->first();
+        $collection = (new MongoDB())->MongoApp->users;  
+        
+        // // dd($userID);
+        // $encode = json_encode($userID);
+        // $decoded =json_decode($encode,true);
+        // $str_decode = $decoded['$oid'];
+        
+        $check = $collection->findOne(['token' => $getToken]);
 
+        // dd($check);
+        // $check = Token::where('token' , $getToken)->first();
+        
         if(!isset($check)){
             return response([
             "message" => "Token Doesnot Exists"
