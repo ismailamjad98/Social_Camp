@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
+use App\Http\Resources\UserResource;
 use App\Models\Comment;
 use App\Models\Post;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Throwable;
 
@@ -15,15 +14,15 @@ class CommentController extends Controller
     public function friend_posts($id)
     {
         try {
-            $f_posts = Post::all()->where('user_id', '==', $id)->where('status', 'public');
+            $friends_posts = Post::all()->where('user_id', '==', $id)->where('status', 'public');
 
-            if ($f_posts->toArray() == null) {
+            if ($friends_posts->toArray() == null) {
                 return "This User Have No Post";
             }
 
-            if (isset($f_posts)) {
+            if (isset($friends_posts)) {
                 return response([
-                    $f_posts
+                    new UserResource($friends_posts)
                 ]);
             }
         } catch (Throwable $e) {
@@ -56,7 +55,7 @@ class CommentController extends Controller
                 if (isset($comment_store)) {
                     return response([
                         'message' => 'Comment Created Succesfully',
-                        'Comment' => $comment_store,
+                        'Comment' =>  new UserResource($comment_store)
                     ]);
                 } else {
                     return response([

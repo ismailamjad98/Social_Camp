@@ -195,10 +195,9 @@ class UserController extends Controller
             $userID = DecodeUser($request);
 
             if ($userID) {
-
                 $profile = User::find($userID);
                 return response([
-                    "Details" => new UserResource($request)
+                    "Details" => new UserResource($profile)
                 ], 200);
             }
         } catch (Throwable $e) {

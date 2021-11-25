@@ -14,6 +14,10 @@ class CommentResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $comment = $request->all();
+        
+         return [
+             "Details" => $comment
+         ];
     }
 }
