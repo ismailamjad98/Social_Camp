@@ -1,3 +1,17 @@
+<h2 align="center">Points Are Done</h2>
+<p>Routes files</P></br>
+<p>Resource</P></br>
+<p>Try catch</P></br>
+<p>Service</P></br>
+<p>Helper function</P></br>
+<p>Constants</P></br>
+<p>Job to send email</P></br>
+<p>Form request validation</P></br>
+<p>user in request </P></br>
+<p>update user </P></br>
+<p>middleware</p>
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
