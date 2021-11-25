@@ -6,9 +6,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Throwable;
 
-class Create_Token_Service
-{
-
+class createToken{
     protected $key;
     protected $payload;
     public function createToken($data)
@@ -29,14 +27,5 @@ class Create_Token_Service
         } catch (Throwable $e) {
             return response(['message' => $e->getMessage()]);
         }
-    }
-
-    public function DecodeUser($getToken)
-    {
-        $this->key = config('constant.key');
-        $decoded = JWT::decode($getToken, new Key($this->key, "HS256"));
-        $userID = $decoded->id;
-        
-        return $userID;
     }
 }

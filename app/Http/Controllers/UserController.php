@@ -6,13 +6,12 @@ use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Resources\UserResource;
 use App\Jobs\New_User_Register;
-use App\Mail\Sendmail;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Models\Token;
 use App\Models\User;
-use App\Services\Decode_User_Service;
+use App\Services\createToken;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
 
@@ -23,23 +22,6 @@ class UserController extends Controller
      *
      */
 
-
-    function createToken($data)
-    {
-        $key = config('constant.key');
-        $payload = array(
-            "iss" => "http://127.0.0.1:8000",
-            "aud" => "http://127.0.0.1:8000/api",
-            "iat" => time(),
-            "nbf" => 1357000000,
-            "id" => $data,
-            'token_type' => 'bearer',
-        );
-
-        $token = JWT::encode($payload, $key, 'HS256');
-        return $token;
-    }
-
     /**
      * Registering a new user.
      */
@@ -49,11 +31,9 @@ class UserController extends Controller
         try {
             // Validate the user inputs
             $request->validated();
-
-            //create a link to varify email.        
-            $verification_token = $this->createToken($request->email);
+            //create a link to varify email.       
+            $verification_token = (new createToken)->createToken($request->email);
             $url = "http://localhost:8000/api/emailVerify/" . $verification_token . '/' . $request->email;
-
             //create new User in DB
             User::create([
                 'name' => $request->name,
@@ -63,13 +43,16 @@ class UserController extends Controller
             ]);
 
             //send mail
-            // Mail::to($request->email)->send(new Sendmail($url, 'bevegak100@d3ff.com'));
-            
             //php artisan queue:work to make your emails in a queue 
             New_User_Register::dispatch($request->email, $url);
 
             //message on Register
-            return new UserResource($request);
+            return [
+                'Status' => '201',
+                'message' => 'Thanks, you have successfully signup',
+                "Mail" => "Email Sended Successfully",
+                'User Details' => new UserResource($request)
+            ];
         } catch (Throwable $e) {
             return $e->getMessage();
         }
@@ -116,7 +99,7 @@ class UserController extends Controller
             ];
 
             //give token after login and assign user id to token
-            $token = $this->createToken($user->id);
+            $token = (new createToken)->createToken($user->id);
 
             if ($user['email_verified_at'] == null) {
                 return response([
@@ -131,7 +114,7 @@ class UserController extends Controller
                     // check if user is already loggedin and assigned token 
                     if (Token::where('user_id', '=', $user->id)->first()) {
                         $token = Token::where('user_id', '=', $user->id)->first()->delete();
-                        $new_token = $this->createToken($user->id);
+                        $new_token = (new createToken)->createToken($user->id);
                         // save token in db to user 
                         $token_save = Token::create([
                             'user_id' => $user->id,
@@ -172,11 +155,9 @@ class UserController extends Controller
     public function Logout(Request $request)
     {
         try {
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
 
-            $userID = $decoded->id;
+           //call a helper function to decode user id
+           $userID = DecodeUser($request);
 
             $userExist = Token::where("user_id", $userID)->first();
 
@@ -209,17 +190,15 @@ class UserController extends Controller
                     "message" => "Invalid Token"
                 ], 200);
             }
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
 
-            $userID =(new Decode_User_Service)->DecodeUser($getToken);
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             if ($userID) {
 
                 $profile = User::find($userID);
                 return response([
-                    "Details" => $profile
+                    "Details" => new UserResource($request)
                 ], 200);
             }
         } catch (Throwable $e) {
@@ -231,15 +210,14 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            
             $userupdate = User::all()->where('id', $id)->first();
-
             //message on Successfully
             if (isset($userupdate)) {
                 $userupdate->update($request->all());
                 return response([
                     'Status' => '200',
                     'message' => 'you have successfully Update User Profile',
+                    'Details' => new UserResource($request)
                 ], 200);
             }
             if ($userupdate == null) {

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use FriendRequest;
 use Throwable;
 
 class Friend_Request extends Controller
@@ -39,7 +40,7 @@ class Friend_Request extends Controller
 
             if (isset($check_alreadySent)) {
                 return response([
-                    "Message" => "You have already Sent the Friend Request to this User"
+                    "Message" => "Can not Send Friend Request"
                 ]);
             }
 
@@ -70,11 +71,11 @@ class Friend_Request extends Controller
             $decoded = JWT::decode($getToken, new Key($key, "HS256"));
             $userID = $decoded->id;
 
-            $req = ModelsFriend_Request::all()->where('reciver_id',  $userID)->where('status', '0');
+            $request = ModelsFriend_Request::all()->where('reciver_id',  $userID)->where('status', '0');
 
-            if (json_decode($req) != null) {
+            if (json_decode($request) != null) {
 
-                return $req;
+                return new FriendRequest($request);
             } else {
                 return response([
                     'message' => 'You Dont have any Friend Request'

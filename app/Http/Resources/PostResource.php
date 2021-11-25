@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class PostResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,11 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
-        //message on Sucessfully
-        $profile = $request->all();
+         //message on Sucessfully 
+         $all_posts = $request->all();
         
-        return [
-            $profile
-        ];
+         return [
+             "Details" => $all_posts
+         ];
     }
 }

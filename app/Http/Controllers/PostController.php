@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -35,6 +36,7 @@ class PostController extends Controller
             return response([
                 'Status' => '200',
                 'message' => 'successfully Posted',
+                'Details' => new PostResource($post)
             ], 200);
         } catch (Throwable $e) {
             return $e->getMessage();
@@ -58,7 +60,7 @@ class PostController extends Controller
                     'message' => 'You dont have any Post',
                 ], 200);
             } else {
-                return $myposts;
+                return new PostResource($myposts);
             }
         } catch (Throwable $e) {
             return $e->getMessage();
@@ -73,7 +75,7 @@ class PostController extends Controller
             if (is_null($myposts)) {
                 return response()->json('Data not found', 404);
             }
-            return $myposts;
+            return new PostResource($myposts);
         } catch (Throwable $e) {
             return $e->getMessage();
         }
