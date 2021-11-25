@@ -209,9 +209,9 @@ class UserController extends Controller
                     "message" => "Invalid Token"
                 ], 200);
             }
-            // $key = config('constant.key');
-            // $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            // $userID = $decoded->id;
+            $key = config('constant.key');
+            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
+            $userID = $decoded->id;
 
             $userID =(new Decode_User_Service)->DecodeUser($getToken);
 
