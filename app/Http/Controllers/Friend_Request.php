@@ -7,8 +7,6 @@ use App\Http\Requests\SendFriendRequest;
 use App\Models\Friend_Request as ModelsFriend_Request;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use FriendRequest;
 use Throwable;
 
@@ -20,11 +18,8 @@ class Friend_Request extends Controller
         try {
             $request->validated();
 
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             if ($userID == $request->reciver_id) {
                 return response([
@@ -65,11 +60,8 @@ class Friend_Request extends Controller
     public function My_Requests(Request $request)
     {
         try {
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             $request = ModelsFriend_Request::all()->where('reciver_id',  $userID)->where('status', '0');
 
@@ -91,11 +83,8 @@ class Friend_Request extends Controller
         try {
             $request->validated();
 
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             if ($userID == $request->sender_id) {
                 return response([
@@ -132,11 +121,8 @@ class Friend_Request extends Controller
     public function Delete_Request(Request $request, $id)
     {
         try {
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             $delete_request = ModelsFriend_Request::all()->where('reciver_id', $userID)->where('sender_id', $id)->first();
 

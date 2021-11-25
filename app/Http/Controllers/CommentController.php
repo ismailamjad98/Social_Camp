@@ -35,10 +35,8 @@ class CommentController extends Controller
     public function create(CommentRequest $request, $id)
     {
         try {
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             $request->validated();
 
@@ -83,11 +81,8 @@ class CommentController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            //get token from header and check user id
-            $key = config('constant.key');
-            $getToken = $request->bearerToken();
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             $update_comment = Comment::all()->where('user_id', $userID)->where('id', $id)->first();
 
@@ -119,10 +114,8 @@ class CommentController extends Controller
     public function delete(Request $request, $id)
     {
         try {
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             $comment = Comment::where('id', $id)->where('user_id', $userID)->first();
 

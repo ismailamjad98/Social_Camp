@@ -17,11 +17,9 @@ class PostController extends Controller
     {
         try {
             $request->validated();
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             //save a new post in db
             $post = new Post;
@@ -46,11 +44,8 @@ class PostController extends Controller
     public function myposts(Request $request)
     {
         try {
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             $myposts = Post::all()->where('user_id',  $userID);
 
@@ -85,11 +80,8 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
 
             $post = Post::all()->where('user_id', $userID)->where('id', $id)->first();
 
@@ -127,11 +119,9 @@ class PostController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            //get token from header and check user id
-            $getToken = $request->bearerToken();
-            $key = config('constant.key');
-            $decoded = JWT::decode($getToken, new Key($key, "HS256"));
-            $userID = $decoded->id;
+            //call a helper function to decode user id
+            $userID = DecodeUser($request);
+
             $delete_post = Post::all()->where('user_id', $userID)->where('id', $id)->first();
 
             if (Post::where('id', '!=', $id)) {
